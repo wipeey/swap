@@ -1,0 +1,14 @@
+[package]
+name = "swap"
+version = "0.1.0"
+edition = "2021"
+authors = ["cyprienbf contact.cyprien@pm.me"]
+description = "A safe CLI tool to swap two files or directories."
+license = "MIT"
+
+[dependencies]
+# Powerful and standard library for parsing command-line arguments
+clap = { version = "4.4.18", features = ["derive"] }
+
+# Used for generating unique temporary filenames to avoid collisions
+uuid = { version = "1.6.1", features = ["v4", "fast-rng"] }
