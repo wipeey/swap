@@ -78,8 +78,20 @@ struct Cli {
     /// By default, items are moved to each other's directories, keeping their original names.
     #[arg(short = 'n', long = "name-swap")]
     name_swap: bool,
+
+	/// Add verbose to log advanced informations in the console.
+    #[arg(short = 'v', long = "verbose")]
+    verbose: bool,
 }
 
+/// Macro rule to handle proper logging in case the verbose argument was passed.
+macro_rules! log {
+    ($cli:expr, $($arg:tt)*) => {
+        if $cli.verbose {
+            println!($($arg)*);
+        }
+    };
+}
 
 // --- Main Application Logic ---
 
@@ -129,22 +141,19 @@ fn run(cli: &Cli) -> Result<(), SwapError> {
 
     // --- 2. Dispatch to the Correct Swap Logic ---
 
-    println!(
-        "Swapping '{}' and '{}'...",
-        path1.display(),
-        path2.display()
-    );
-    if cli.name_swap {
-        println!("Mode: Swapping names.");
-        swap_names(&path1, &path2)
-    } else {
-        println!("Mode: Swapping locations.");
-        swap_locations(&path1, &path2)
-    }
+	log!(cli, "Swapping '{}' and '{}'...", path1.display(), path2.display());
+
+	if cli.name_swap {
+	    log!(cli, "Mode: Swapping names.");
+	    swap_names(&path1, &path2, cli)
+	} else {
+	    log!(cli, "Mode: Swapping locations.");
+	    swap_locations(&path1, &path2, cli)
+	}
 }
 
 /// Swaps the locations of two paths.
-fn swap_locations(path1: &Path, path2: &Path) -> Result<(), SwapError> {
+fn swap_locations(path1: &Path, path2: &Path, cli: &Cli) -> Result<(), SwapError> {
     let parent1 = path1.parent().ok_or_else(|| SwapError::MissingParent(path1.to_path_buf()))?;
     let parent2 = path2.parent().ok_or_else(|| SwapError::MissingParent(path2.to_path_buf()))?;
 
@@ -156,20 +165,20 @@ fn swap_locations(path1: &Path, path2: &Path) -> Result<(), SwapError> {
     
     let temp_path = generate_temporary_path(path1)?;
 
-    println!(" 1. Moving '{}' -> '{}' (temporary)", path1.display(), temp_path.display());
+    log!(cli, " 1. Moving '{}' -> '{}' (temporary)", path1.display(), temp_path.display());
     safe_rename(path1, &temp_path)?;
     
-    println!(" 2. Moving '{}' -> '{}'", path2.display(), final_dest2.display());
+    log!(cli, " 2. Moving '{}' -> '{}'", path2.display(), final_dest2.display());
     safe_rename(path2, &final_dest2)?;
 
-    println!(" 3. Moving '{}' (temporary) -> '{}'", temp_path.display(), final_dest1.display());
+    log!(cli, " 3. Moving '{}' (temporary) -> '{}'", temp_path.display(), final_dest1.display());
     safe_rename(&temp_path, &final_dest1)?;
 
     Ok(())
 }
 
 /// Swaps the names of two paths.
-fn swap_names(path1: &Path, path2: &Path) -> Result<(), SwapError> {
+fn swap_names(path1: &Path, path2: &Path, cli: &Cli) -> Result<(), SwapError> {
     let parent1 = path1.parent().ok_or_else(|| SwapError::MissingParent(path1.to_path_buf()))?;
     let parent2 = path2.parent().ok_or_else(|| SwapError::MissingParent(path2.to_path_buf()))?;
     
@@ -181,13 +190,13 @@ fn swap_names(path1: &Path, path2: &Path) -> Result<(), SwapError> {
 
     let temp_path = generate_temporary_path(path1)?;
 
-    println!(" 1. Renaming '{}' -> '{}' (temporary)", path1.display(), temp_path.display());
+	log!(cli, " 1. Renaming '{}' -> '{}' (temporary)", path1.display(), temp_path.display());
     safe_rename(path1, &temp_path)?;
-
-    println!(" 2. Renaming '{}' -> '{}'", path2.display(), final_dest2.display());
+	
+    log!(cli, " 2. Renaming '{}' -> '{}' (temporary)", path2.display(), final_dest2.display());
     safe_rename(path2, &final_dest2)?;
-
-    println!(" 3. Renaming '{}' (temporary) -> '{}'", temp_path.display(), final_dest1.display());
+    
+    log!(cli, " 3. Renaming '{}' (temporary) -> '{}' ", temp_path.display(), final_dest1.display());
     safe_rename(&temp_path, &final_dest1)?;
 
     Ok(())
