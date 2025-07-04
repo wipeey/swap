@@ -1,6 +1,6 @@
 [package]
 name = "swap"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["cyprienbf contact.cyprien@pm.me"]
 description = "A safe CLI tool to swap two files or directories."

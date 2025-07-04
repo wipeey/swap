@@ -49,7 +49,7 @@ Arguments:
 
 Options:
   -n, --name-swap  Swap names instead of locations. If this flag is present, items will be renamed to each other but stay in their original directories. By default, items are moved to each other's directories, keeping their original names
-  -v, --verbose    Add verbose to log advanced informations in the console
+  -v, --verbose    Add verbose to log advanced information in the console
   -h, --help       Print help
   -V, --version    Print version
 ```

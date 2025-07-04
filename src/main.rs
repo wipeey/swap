@@ -79,7 +79,7 @@ struct Cli {
     #[arg(short = 'n', long = "name-swap")]
     name_swap: bool,
 
-	/// Add verbose to log advanced informations in the console.
+	/// Add verbose to log advanced information in the console.
     #[arg(short = 'v', long = "verbose")]
     verbose: bool,
 }
